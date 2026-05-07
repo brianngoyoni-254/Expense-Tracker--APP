@@ -87,7 +87,7 @@ src/
 
 Installation
 1. Clone the Repository
-git clone <your-repository-url>
+git clone 
 2. Navigate into the Project
 cd expense-tracker
 3. Install Dependencies
