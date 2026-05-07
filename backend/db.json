@@ -1,0 +1,69 @@
+{
+  "expenses": [
+    {
+      "id": "1",
+      "title": "Transport",
+      "description": "Matatu fare to town",
+      "category": "Transport",
+      "amount": 100,
+      "date": "2026-05-06"
+    },
+    {
+      "id": "2",
+      "title": "Lunch",
+      "description": "Food at hotel",
+      "category": "Food",
+      "amount": 400,
+      "date": "2026-05-06"
+    },
+    {
+      "title": "football",
+      "description": "watching football",
+      "category": "Sports",
+      "amount": 5000,
+      "date": "2026-05-08",
+      "id": "Q2uttO7BQzw"
+    },
+    {
+      "title": "PS",
+      "description": "Gaming with friends",
+      "category": "Sports",
+      "amount": 500,
+      "date": "2026-05-09",
+      "id": "SctA1-Qj_Lc"
+    },
+    {
+      "title": "Fish",
+      "description": "Enjoyed some nice tilapia at wakalucy",
+      "category": "Food",
+      "amount": 300,
+      "date": "2026-05-08",
+      "id": "5WixbQ4gWFY"
+    },
+    {
+      "title": "ps",
+      "description": "gaming with friends",
+      "category": "Sports",
+      "amount": 500,
+      "date": "2026-05-08",
+      "id": "m5Q4g6gYe0k"
+    },
+    {
+      "title": "Roadtrip",
+      "description": "travel  to Namanga",
+      "category": "Transport",
+      "amount": 5000,
+      "date": "2026-05-08",
+      "id": "u6AZdbonuPc"
+    },
+    {
+      "title": "Deploying websites",
+      "description": "deploying several websites and hosting them",
+      "category": "Programming",
+      "amount": 10000,
+      "date": "2026-05-09",
+      "id": "dZcEwDaNqTY"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
