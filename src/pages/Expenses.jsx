@@ -1,50 +1,67 @@
 import { useState } from "react";
 
 export default function Expenses({
-  expenses = [], 
+  expenses = [],
   handleDelete,
   handleEdit,
 }) {
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({});
 
+  const API_URL = "http://localhost:3001/transactions";
+
   // START EDIT
   const startEdit = (expense) => {
     setEditingId(expense.id);
-    setEditForm(expense);
+
+    setEditForm({
+      ...expense,
+    });
   };
 
   // HANDLE CHANGE
   const handleChange = (e) => {
-    setEditForm({
-      ...editForm,
+    setEditForm((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
+    }));
   };
 
   // SAVE EDIT
   const saveEdit = async () => {
     try {
+      const payload = {
+        ...editForm,
+        amount: Number(editForm.amount || 0),
+      };
+
       const res = await fetch(
-        `http://localhost:3001/expenses/${editingId}`,
+        `${API_URL}/${editingId}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            ...editForm,
-            amount: Number(editForm.amount),
-          }),
+          body: JSON.stringify(payload),
         }
       );
 
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        throw new Error("Update failed");
+      }
 
-      handleEdit?.(); // ✅ safe call
+      // refresh parent data
+      handleEdit?.();
 
+      // exit edit mode
       setEditingId(null);
+
+      setEditForm({});
+
+      alert("Expense updated successfully");
     } catch (err) {
+      console.log(err);
+
       alert("Failed to update expense");
     }
   };
@@ -63,16 +80,17 @@ export default function Expenses({
 
     if (!confirmAction) return;
 
-    handleDelete?.(id); 
+    handleDelete?.(id);
   };
 
   return (
     <div className="h-[calc(100vh-100px)] overflow-y-auto">
+
       <h2 className="text-2xl font-bold mb-4">
         All Expenses
       </h2>
 
-      {/*safe fallback */}
+      {/* EMPTY */}
       {(expenses || []).length === 0 ? (
         <p className="text-gray-500">
           No expenses found
@@ -85,14 +103,17 @@ export default function Expenses({
               key={e.id}
               className="bg-white p-4 rounded shadow"
             >
+
               {/* EDIT MODE */}
               {editingId === e.id ? (
                 <div className="space-y-2">
+
                   <input
                     name="title"
                     value={editForm.title || ""}
                     onChange={handleChange}
                     className="border p-2 w-full rounded"
+                    placeholder="Title"
                   />
 
                   <input
@@ -100,13 +121,16 @@ export default function Expenses({
                     value={editForm.category || ""}
                     onChange={handleChange}
                     className="border p-2 w-full rounded"
+                    placeholder="Category"
                   />
 
                   <input
+                    type="number"
                     name="amount"
                     value={editForm.amount || ""}
                     onChange={handleChange}
                     className="border p-2 w-full rounded"
+                    placeholder="Amount"
                   />
 
                   <input
@@ -122,9 +146,11 @@ export default function Expenses({
                     value={editForm.description || ""}
                     onChange={handleChange}
                     className="border p-2 w-full rounded"
+                    placeholder="Description"
                   />
 
                   <div className="flex gap-2 mt-2">
+
                     <button
                       onClick={saveEdit}
                       className="bg-green-500 px-3 py-1 text-white rounded"
@@ -138,7 +164,9 @@ export default function Expenses({
                     >
                       Cancel
                     </button>
+
                   </div>
+
                 </div>
               ) : (
                 /* VIEW MODE */
@@ -155,11 +183,12 @@ export default function Expenses({
                     {e.description}
                   </p>
 
-                  <p className="mt-2 font-bold text-green-600">
-                    KES {e.amount}
+                  <p className="mt-2 font-bold text-red-600">
+                    KES {Number(e.amount || 0).toLocaleString()}
                   </p>
 
                   <div className="flex gap-2 mt-3">
+
                     <button
                       onClick={() => startEdit(e)}
                       className="bg-yellow-500 px-3 py-1 text-white rounded"
@@ -173,13 +202,17 @@ export default function Expenses({
                     >
                       Delete
                     </button>
+
                   </div>
                 </>
               )}
+
             </div>
           ))}
+
         </div>
       )}
+
     </div>
   );
 }

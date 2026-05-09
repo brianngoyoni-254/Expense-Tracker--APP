@@ -69,9 +69,49 @@
       "date": "2026-05-08",
       "type": "expense",
       "wallet": "-Ksikb7poNA"
+    },
+    {
+      "id": "og6JrbrlvHo",
+      "title": "Rent",
+      "description": "paid my house rent",
+      "category": "House",
+      "amount": 15000,
+      "date": "2026-05-09",
+      "type": "expense",
+      "wallet": "oqTaTHHMMKg"
+    },
+    {
+      "id": "ynkZ6wrdb1A",
+      "title": "Fries",
+      "description": "bought fries for my family",
+      "category": "Food",
+      "amount": 3000,
+      "date": "2026-05-07",
+      "type": "expense",
+      "wallet": "oqTaTHHMMKg"
+    },
+    {
+      "id": "ZY8BqXAKybU",
+      "title": "gaming",
+      "description": "playing fifa with friends",
+      "category": "Sports",
+      "amount": 1000,
+      "date": "2026-05-06",
+      "type": "expense",
+      "wallet": "oqTaTHHMMKg"
     }
   ],
-  "income": [],
+  "income": [
+    {
+      "id": "bJX_fJuMJSw",
+      "title": "freelance",
+      "description": "received pending money from client",
+      "amount": 20000,
+      "date": "2026-05-09",
+      "wallet": "oqTaTHHMMKg",
+      "type": "income"
+    }
+  ],
   "wallets": [
     {
       "id": "oqTaTHHMMKg",
@@ -153,6 +193,45 @@
       "date": "2026-05-08",
       "type": "expense",
       "wallet": "-Ksikb7poNA"
+    },
+    {
+      "id": "SKy-VnE-e3A",
+      "title": "Rent",
+      "description": "paid my house rent",
+      "category": "House",
+      "amount": 16000,
+      "date": "2026-05-09",
+      "type": "expense",
+      "wallet": "oqTaTHHMMKg"
+    },
+    {
+      "id": "S72Dah2MkD0",
+      "title": "freelance",
+      "description": "received pending money from client",
+      "amount": 20000,
+      "date": "2026-05-09",
+      "wallet": "oqTaTHHMMKg",
+      "type": "income"
+    },
+    {
+      "id": "slqZ4O4_p44",
+      "title": "Fries",
+      "description": "bought fries for my family",
+      "category": "Food",
+      "amount": 3000,
+      "date": "2026-05-07",
+      "type": "expense",
+      "wallet": "oqTaTHHMMKg"
+    },
+    {
+      "id": "Um_uhpk_m1k",
+      "title": "gaming",
+      "description": "playing fifa with friends",
+      "category": "Sports",
+      "amount": 1000,
+      "date": "2026-05-06",
+      "type": "expense",
+      "wallet": "oqTaTHHMMKg"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

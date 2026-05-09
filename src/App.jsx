@@ -13,18 +13,14 @@ import Transactions from "./pages/Transactions";
 export default function App() {
   const API = "http://localhost:3001";
 
-  
   // SINGLE SOURCE OF TRUTH
-  
   const [transactions, setTransactions] = useState([]);
   const [wallets, setWallets] = useState([]);
 
   const [search, setSearch] = useState("");
   const [sortType, setSortType] = useState("");
 
-
   // MASTER SYNC FUNCTION
-
   const refreshAll = async () => {
     try {
       const [trxRes, walletRes] = await Promise.all([
@@ -47,16 +43,12 @@ export default function App() {
     }
   };
 
-  
   // INITIAL LOAD
-  
   useEffect(() => {
     refreshAll();
   }, []);
 
-  
   // DELETE TRANSACTION
-  
   const handleDelete = async (id) => {
     try {
       await fetch(`${API}/transactions/${id}`, {
@@ -69,18 +61,14 @@ export default function App() {
     }
   };
 
-  
   // TOAST SYSTEM
-  
   const showToast = {
     success: (msg) => alert(msg),
     error: (msg) => alert(msg),
     warning: (msg) => alert(msg),
   };
 
-  
   // UI ROUTES
-  
   return (
     <Routes>
 
@@ -113,8 +101,7 @@ export default function App() {
                 (t) => t.type === "expense"
               )}
 
-              
-              // PASS REAL WALLETS INTO AddExpense
+              // PASS REAL WALLETS
               wallets={wallets}
 
               fetchExpenses={refreshAll}
@@ -169,6 +156,7 @@ export default function App() {
           element={
             <Transactions
               transactions={transactions}
+              wallets={wallets}
             />
           }
         />

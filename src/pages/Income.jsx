@@ -9,9 +9,7 @@ export default function Income({
   const API_URL = "http://localhost:3001/transactions";
   const INCOME_URL = "http://localhost:3001/income";
 
-  
   // FORM
-  
   const initialForm = {
     title: "",
     description: "",
@@ -24,16 +22,13 @@ export default function Income({
   const [localTransactions, setLocalTransactions] = useState([]);
 
   // FETCH TRANSACTIONS
-  
   useEffect(() => {
     const load = async () => {
       try {
         const res = await fetch(API_URL);
         const data = await res.json();
 
-        setLocalTransactions(
-          Array.isArray(data) ? data : []
-        );
+        setLocalTransactions(Array.isArray(data) ? data : []);
       } catch {
         setLocalTransactions([]);
       }
@@ -43,16 +38,13 @@ export default function Income({
   }, [transactions]);
 
   // FILTER INCOME
-  
   const income = useMemo(() => {
     return localTransactions.filter(
       (t) => t?.type === "income"
     );
   }, [localTransactions]);
 
-  
   // TOTAL INCOME
-  
   const totalIncome = useMemo(() => {
     return income.reduce(
       (sum, t) => sum + Number(t?.amount || 0),
@@ -60,18 +52,23 @@ export default function Income({
     );
   }, [income]);
 
-  
   // NORMALIZE
-  
   const normalize = (v) =>
     (v || "")
       .toString()
       .toLowerCase()
       .replace(/\s+/g, "-");
 
-  
+  // GET WALLET NAME
+  const getWalletName = (walletId) => {
+    const found = wallets.find(
+      (w) => normalize(w.id) === normalize(walletId)
+    );
+
+    return found?.name || walletId || "—";
+  };
+
   // INCOME PER WALLET
-  
   const incomeByWallet = useMemo(() => {
     const map = {};
 
@@ -90,9 +87,7 @@ export default function Income({
     return map;
   }, [income]);
 
-  
   // INPUT CHANGE
-  
   const handleChange = (e) => {
     setFormData((p) => ({
       ...p,
@@ -100,9 +95,7 @@ export default function Income({
     }));
   };
 
-  
   // VALIDATION
-  
   const validate = () => {
     if (
       !formData.title.trim() ||
@@ -116,9 +109,7 @@ export default function Income({
     return true;
   };
 
-  
   // SAVE INCOME
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -166,9 +157,7 @@ export default function Income({
     }
   };
 
-
   // UI
-  
   return (
     <div className="space-y-6">
 
@@ -301,32 +290,57 @@ export default function Income({
       {/* LIST */}
       <div className="bg-white p-6 rounded-2xl shadow">
 
-        {income.length === 0 ? (
-          <p className="text-gray-500">
-            No income yet
-          </p>
-        ) : (
-          income.map((i) => (
-            <div
-              key={i.id}
-              className="border p-3 rounded mb-2"
-            >
+        <h2 className="text-xl font-bold mb-4">
+          Income History
+        </h2>
 
-              <p className="font-bold">
-                {i.title}
-              </p>
+        {/* SCROLLABLE CONTAINER */}
+        <div className="max-h-[400px] overflow-y-auto pr-2">
 
-              <p className="text-green-600">
-                KES {i.amount}
-              </p>
+          {income.length === 0 ? (
+            <p className="text-gray-500">
+              No income yet
+            </p>
+          ) : (
+            income.map((i) => (
+              <div
+                key={i.id}
+                className="border p-3 rounded mb-3"
+              >
 
-              <p className="text-xs text-gray-500">
-                Wallet: {i.wallet}
-              </p>
+                <div className="flex justify-between items-start">
 
-            </div>
-          ))
-        )}
+                  <div>
+                    <p className="font-bold text-lg">
+                      {i.title}
+                    </p>
+
+                    <p className="text-xs text-gray-500 mt-1">
+                      Date: {i.date || "—"}
+                    </p>
+
+                    <p className="text-xs text-gray-500">
+                      Wallet: {getWalletName(i.wallet)}
+                    </p>
+
+                    {i.description && (
+                      <p className="text-sm text-gray-600 mt-2">
+                        {i.description}
+                      </p>
+                    )}
+                  </div>
+
+                  <p className="text-green-600 font-bold text-lg">
+                    KES {Number(i.amount || 0).toLocaleString()}
+                  </p>
+
+                </div>
+
+              </div>
+            ))
+          )}
+
+        </div>
 
       </div>
 
