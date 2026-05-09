@@ -16,30 +16,49 @@ import {
 
 export default function Dashboard({
   transactions = [],
+  wallets = [],
   search = "",
   setSearch = () => {},
   sortType = "",
   setSortType = () => {},
 }) {
 
-  
+  // HELPERS
   const getAmount = (t) => Number(t?.amount || 0);
 
   const getDate = (t) => new Date(t?.date || 0);
 
+  // NORMALIZE
+  const normalize = (v) =>
+    (v || "")
+      .toString()
+      .toLowerCase()
+      .replace(/\s+/g, "-");
+
+  // GET WALLET NAME
+  const getWalletName = (walletId) => {
+    const found = wallets.find(
+      (w) => normalize(w.id) === normalize(walletId)
+    );
+
+    return found?.name || walletId || "—";
+  };
+
   // Separate income transactions
   const income = useMemo(
-    () => (Array.isArray(transactions)
-      ? transactions.filter((t) => t?.type === "income")
-      : []),
+    () =>
+      Array.isArray(transactions)
+        ? transactions.filter((t) => t?.type === "income")
+        : [],
     [transactions]
   );
 
   // Separate expense transactions
   const expenses = useMemo(
-    () => (Array.isArray(transactions)
-      ? transactions.filter((t) => t?.type === "expense")
-      : []),
+    () =>
+      Array.isArray(transactions)
+        ? transactions.filter((t) => t?.type === "expense")
+        : [],
     [transactions]
   );
 
@@ -54,7 +73,7 @@ export default function Dashboard({
         (e.title || "").toLowerCase().includes(s) ||
         (e.category || "").toLowerCase().includes(s) ||
         (e.description || "").toLowerCase().includes(s) ||
-        (e.wallet || "").toLowerCase().includes(s)
+        getWalletName(e.wallet).toLowerCase().includes(s)
       );
     }
 
@@ -73,23 +92,28 @@ export default function Dashboard({
     }
 
     return data;
-  }, [expenses, search, sortType]);
+  }, [expenses, search, sortType, wallets]);
 
-  
-  const totalIncome = income.reduce((s, t) => s + getAmount(t), 0);
+  // TOTALS
+  const totalIncome = income.reduce(
+    (s, t) => s + getAmount(t),
+    0
+  );
 
-  const totalExpenses = expenses.reduce((s, t) => s + getAmount(t), 0);
-
+  const totalExpenses = expenses.reduce(
+    (s, t) => s + getAmount(t),
+    0
+  );
 
   const balance = totalIncome - totalExpenses;
 
-  //  Savings percentage
+  // SAVINGS %
   const savingsRate =
     totalIncome > 0
       ? ((balance / totalIncome) * 100).toFixed(1)
       : 0;
 
-  // Prepare chart dataset (income vs expense per date)
+  // CHART DATA
   const chartData = useMemo(() => {
     if (!transactions.length) return [];
 
@@ -120,7 +144,7 @@ export default function Dashboard({
     );
   }, [transactions]);
 
-  //  latest 10 transactions
+  // RECENT TRANSACTIONS
   const recentTransactions = useMemo(() => {
     if (!transactions.length) return [];
 
@@ -132,10 +156,11 @@ export default function Dashboard({
   return (
     <div className="space-y-6">
 
-      {/*Sticky search + sort header */}
+      {/* STICKY SEARCH */}
       <div className="sticky top-0 z-50 w-full bg-gray-100">
 
         <div className="w-full bg-white px-4 py-4 rounded-2xl shadow">
+
           <SmartSearch
             search={search}
             setSearch={setSearch}
@@ -143,15 +168,17 @@ export default function Dashboard({
             setSortType={setSortType}
             expenses={expenses}
           />
+
         </div>
 
       </div>
 
-      {/* Summary statistics cards */}
+      {/* SUMMARY */}
       <div className="grid md:grid-cols-4 gap-4">
 
         <div className="bg-white p-4 rounded-2xl shadow">
           <h3 className="font-bold">Balance</h3>
+
           <p className="text-blue-600 text-2xl font-bold">
             KES {balance.toLocaleString()}
           </p>
@@ -159,6 +186,7 @@ export default function Dashboard({
 
         <div className="bg-white p-4 rounded-2xl shadow">
           <h3 className="font-bold">Income</h3>
+
           <p className="text-green-600 text-2xl font-bold">
             KES {totalIncome.toLocaleString()}
           </p>
@@ -166,6 +194,7 @@ export default function Dashboard({
 
         <div className="bg-white p-4 rounded-2xl shadow">
           <h3 className="font-bold">Expenses</h3>
+
           <p className="text-red-600 text-2xl font-bold">
             KES {totalExpenses.toLocaleString()}
           </p>
@@ -173,6 +202,7 @@ export default function Dashboard({
 
         <div className="bg-white p-4 rounded-2xl shadow">
           <h3 className="font-bold">Savings</h3>
+
           <p className="text-purple-600 text-2xl font-bold">
             {savingsRate}%
           </p>
@@ -180,11 +210,12 @@ export default function Dashboard({
 
       </div>
 
-      {/* Charts section (income vs expense trend) */}
+      {/* CHARTS */}
       <div className="grid md:grid-cols-2 gap-4">
 
-        {/* Bar chart */}
+        {/* BAR CHART */}
         <div className="bg-white p-4 rounded-2xl shadow">
+
           <h3 className="font-bold mb-3">
             Income vs Expenses (Daily)
           </h3>
@@ -195,14 +226,17 @@ export default function Dashboard({
               <YAxis />
               <Tooltip />
               <Legend />
+
               <Bar dataKey="income" fill="#22c55e" />
               <Bar dataKey="expense" fill="#ef4444" />
             </BarChart>
           </ResponsiveContainer>
+
         </div>
 
-        {/* Line chart */}
+        {/* LINE CHART */}
         <div className="bg-white p-4 rounded-2xl shadow">
+
           <h3 className="font-bold mb-3">
             Cash Flow Trend
           </h3>
@@ -210,19 +244,31 @@ export default function Dashboard({
           <ResponsiveContainer width="100%" height={250}>
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" />
+
               <XAxis dataKey="date" />
               <YAxis />
               <Tooltip />
               <Legend />
-              <Line type="monotone" dataKey="income" stroke="#22c55e" />
-              <Line type="monotone" dataKey="expense" stroke="#ef4444" />
+
+              <Line
+                type="monotone"
+                dataKey="income"
+                stroke="#22c55e"
+              />
+
+              <Line
+                type="monotone"
+                dataKey="expense"
+                stroke="#ef4444"
+              />
             </LineChart>
           </ResponsiveContainer>
+
         </div>
 
       </div>
 
-      {/* Expense list (filtered + scrollable container) */}
+      {/* EXPENSES */}
       <div className="bg-white p-4 rounded-2xl shadow">
 
         <h3 className="font-bold mb-3">
@@ -237,7 +283,10 @@ export default function Dashboard({
             </p>
           ) : (
             processedExpenses.map((e) => (
-              <div key={e.id} className="border p-3 rounded">
+              <div
+                key={e.id}
+                className="border p-3 rounded"
+              >
 
                 <p className="font-bold">
                   {e.title} • {e.category}
@@ -245,6 +294,10 @@ export default function Dashboard({
 
                 <p className="text-sm text-gray-600">
                   {e.description}
+                </p>
+
+                <p className="text-blue-600 text-sm font-bold mt-1">
+                  Wallet: {getWalletName(e.wallet)}
                 </p>
 
                 <p className="text-green-600 font-bold">
@@ -260,56 +313,80 @@ export default function Dashboard({
           )}
 
         </div>
+
       </div>
 
-      {/* Recent transactions table (latest activity view) */}
+      {/* RECENT TRANSACTIONS */}
       <div className="bg-white p-4 rounded-2xl shadow">
 
         <h3 className="font-bold mb-3">
           Recent Transactions
         </h3>
 
-        <div className="max-h-[320px] overflow-y-auto">
+        {/* SCROLLABLE TABLE CONTAINER */}
+        <div className="max-h-[350px] overflow-y-auto overflow-x-auto rounded">
 
           {recentTransactions.length === 0 ? (
             <p className="text-gray-400 text-sm">
               No transactions yet
             </p>
           ) : (
-            <table className="w-full text-sm">
+            <table className="w-full text-sm min-w-[700px]">
 
-              <thead>
+              {/* STICKY HEADER */}
+              <thead className="sticky top-0 bg-white z-10">
                 <tr className="border-b text-left">
-                  <th>Title</th>
-                  <th>Type</th>
-                  <th>Category</th>
-                  <th>Wallet</th>
-                  <th>Amount</th>
-                  <th>Date</th>
+                  <th className="p-2">Title</th>
+                  <th className="p-2">Type</th>
+                  <th className="p-2">Category</th>
+                  <th className="p-2">Wallet</th>
+                  <th className="p-2">Amount</th>
+                  <th className="p-2">Date</th>
                 </tr>
               </thead>
 
               <tbody>
-                {recentTransactions.map((t) => (
-                  <tr key={t.id} className="border-b">
 
-                    <td>{t.title}</td>
-                    <td>{t.type}</td>
-                    <td>{t.category || "—"}</td>
-                    <td className="text-blue-600 font-bold">
-                      {t.wallet || "default"}
+                {recentTransactions.map((t) => (
+                  <tr
+                    key={t.id}
+                    className="border-b"
+                  >
+
+                    <td className="p-2">
+                      {t.title}
                     </td>
-                    <td>KES {Number(t.amount || 0).toLocaleString()}</td>
-                    <td>{t.date}</td>
+
+                    <td className="p-2">
+                      {t.type}
+                    </td>
+
+                    <td className="p-2">
+                      {t.category || "—"}
+                    </td>
+
+                    <td className="text-blue-600 font-bold p-2">
+                      {getWalletName(t.wallet)}
+                    </td>
+
+                    <td className="p-2">
+                      KES {Number(t.amount || 0).toLocaleString()}
+                    </td>
+
+                    <td className="p-2">
+                      {t.date}
+                    </td>
 
                   </tr>
                 ))}
+
               </tbody>
 
             </table>
           )}
 
         </div>
+
       </div>
 
     </div>

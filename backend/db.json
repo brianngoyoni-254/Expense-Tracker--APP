@@ -99,6 +99,16 @@
       "date": "2026-05-06",
       "type": "expense",
       "wallet": "oqTaTHHMMKg"
+    },
+    {
+      "id": "H33RD0rYLEM",
+      "title": "wedding",
+      "description": "contributions for Rays wedding",
+      "category": "Contributions",
+      "amount": 5000,
+      "date": "2026-05-06",
+      "type": "expense",
+      "wallet": "-Ksikb7poNA"
     }
   ],
   "income": [
@@ -232,6 +242,16 @@
       "date": "2026-05-06",
       "type": "expense",
       "wallet": "oqTaTHHMMKg"
+    },
+    {
+      "id": "6wIRE80azHQ",
+      "title": "wedding",
+      "description": "contributions for Rays wedding",
+      "category": "Contributions",
+      "amount": 6000,
+      "date": "2026-05-06",
+      "type": "expense",
+      "wallet": "-Ksikb7poNA"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
