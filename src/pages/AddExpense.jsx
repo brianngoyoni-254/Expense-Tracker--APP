@@ -1,11 +1,14 @@
 import { useState, useMemo } from "react";
 
 export default function AddExpense({
-  expenses,
+  expenses = [],
   fetchExpenses,
   showToast,
+  fetchTransactions,
+  wallets = [],
 }) {
   const API_URL = "http://localhost:3001/expenses";
+  const TRANSACTIONS_URL = "http://localhost:3001/transactions";
 
   const initialForm = {
     title: "",
@@ -13,276 +16,198 @@ export default function AddExpense({
     category: "",
     amount: "",
     date: "",
+    wallet: "",
   };
 
-  const [formData, setFormData] =
-    useState(initialForm);
+  const [formData, setFormData] = useState(initialForm);
+  const [customCategory, setCustomCategory] = useState("");
+  const [errors, setErrors] = useState({});
 
-  const [customCategory, setCustomCategory] =
-    useState("");
-
-  // ERRORS 
-  const [errors, setErrors] = useState({
-    title: "",
-    description: "",
-    category: "",
-    amount: "",
-    date: "",
-    customCategory: "",
-  });
-
-  // UNIQUE CATEGORIES 
+  // CATEGORIES
+  
   const categories = useMemo(() => {
+    if (!Array.isArray(expenses)) return [];
+
     return [
       ...new Set(
         expenses
-          .map((e) => e.category)
-          .filter(Boolean)
+          .map((e) => e?.category)
+          .filter((c) => typeof c === "string" && c.trim() !== "")
       ),
     ];
   }, [expenses]);
 
-  // VALIDATION 
+  // VALIDATION
+  
   const validateField = (name, value) => {
     let error = "";
+    const v = value ?? "";
 
-    if (!value || value.toString().trim() === "") {
-      error = "This field is required";
+    if (v.toString().trim() === "") {
+      error = "Required";
     }
 
     if (name === "amount") {
-      if (!value) {
-        error = "Amount is required";
-      } else if (Number(value) <= 0) {
-        error =
-          "Amount must be greater than 0";
+      if (!v || Number(v) <= 0) {
+        error = "Invalid amount";
       }
     }
 
-    setErrors((prev) => ({
-      ...prev,
-      [name]: error,
-    }));
+    if (name === "wallet") {
+      if (!v) {
+        error = "Please select a wallet";
+      }
+    }
+
+    setErrors((p) => ({ ...p, [name]: error }));
 
     return error === "";
   };
 
-  // VALIDATE ALL 
   const validateForm = () => {
-    const titleValid = validateField(
-      "title",
-      formData.title
-    );
-
-    const descriptionValid = validateField(
-      "description",
-      formData.description
-    );
-
-    const amountValid = validateField(
-      "amount",
-      formData.amount
-    );
-
-    const dateValid = validateField(
-      "date",
-      formData.date
-    );
+    const a = validateField("title", formData.title);
+    const b = validateField("description", formData.description);
+    const c = validateField("amount", formData.amount);
+    const d = validateField("date", formData.date);
 
     const categoryValue =
       formData.category === "__new"
         ? customCategory
         : formData.category;
 
-    const categoryValid = validateField(
-      "category",
-      categoryValue
-    );
+    const e = validateField("category", categoryValue);
 
-    if (formData.category === "__new") {
-      const customValid = validateField(
-        "customCategory",
-        customCategory
-      );
+    const walletValid = validateField("wallet", formData.wallet);
 
-      return (
-        titleValid &&
-        descriptionValid &&
-        amountValid &&
-        dateValid &&
-        categoryValid &&
-        customValid
-      );
-    }
-
-    return (
-      titleValid &&
-      descriptionValid &&
-      amountValid &&
-      dateValid &&
-      categoryValid
-    );
+    return a && b && c && d && e && walletValid;
   };
 
-  // INPUT 
+  
+  // HANDLERS
+  
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
+    setFormData((p) => ({
+      ...p,
       [e.target.name]: e.target.value,
-    });
+    }));
   };
 
-  // BLUR 
   const handleBlur = (e) => {
-    validateField(
-      e.target.name,
-      e.target.value
-    );
+    validateField(e.target.name, e.target.value);
   };
 
-  // DELETE CATEGORY 
-  const handleDeleteCategory = async (cat) => {
-    const confirmDelete = window.confirm(
-      `Delete ALL expenses under "${cat}" category?`
-    );
 
-    if (!confirmDelete) return;
-
+  // DELETE CATEGORY
+  
+  const handleDeleteCategory = async (category) => {
     try {
-      const toDelete = expenses.filter(
-        (e) => e.category === cat
+      const updated = expenses.map((e) =>
+        e.category === category
+          ? { ...e, category: "uncategorized" }
+          : e
       );
 
       await Promise.all(
-        toDelete.map((e) =>
+        updated.map((e) =>
           fetch(`${API_URL}/${e.id}`, {
-            method: "DELETE",
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(e),
           })
         )
       );
 
-      showToast.warning(
-        `Category "${cat}" removed`
-      );
+      showToast?.success?.("Category deleted");
 
-      fetchExpenses();
-    } catch (err) {
-      showToast.error(
-        "Failed to remove category"
-      );
+      fetchExpenses?.();
+      fetchTransactions?.();
+    } catch {
+      showToast?.error?.("Failed to delete category");
     }
   };
 
-  // SUBMIT 
+  
+  // SUBMIT
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const isValid = validateForm();
-
-    if (!isValid) {
-      showToast.error(
-        "Please fill all required fields"
-      );
+    if (!validateForm()) {
+      showToast?.error?.("Please fill all fields correctly");
       return;
     }
 
-    let finalCategory = formData.category;
-
-    // NEW CATEGORY 
-    if (formData.category === "__new") {
-      const exists = categories.some(
-        (c) =>
-          c.toLowerCase() ===
-          customCategory.toLowerCase()
-      );
-
-      if (exists) {
-        showToast.error(
-          "Category already exists"
-        );
-        return;
-      }
-
-      finalCategory = customCategory;
-    }
+    const finalCategory =
+      formData.category === "__new"
+        ? customCategory
+        : formData.category;
 
     const payload = {
-      ...formData,
+      id: Date.now().toString(),
+      title: formData.title,
+      description: formData.description,
       category: finalCategory,
       amount: Number(formData.amount),
+      date: formData.date,
+      type: "expense",
+      wallet: formData.wallet,
     };
 
     try {
-      const response = await fetch(API_URL, {
+      // SAVE TO EXPENSES
+      await fetch(API_URL, {
         method: "POST",
         headers: {
-          "Content-Type":
-            "application/json",
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
       });
 
-      if (!response.ok) {
-        throw new Error();
-      }
-
-      // SUCCESS 
-      showToast.success(
-        "Saved successfully"
-      );
-
-      // RESET FORM 
-      setFormData(initialForm);
-      setCustomCategory("");
-
-      setErrors({
-        title: "",
-        description: "",
-        category: "",
-        amount: "",
-        date: "",
-        customCategory: "",
+      // SAVE TO TRANSACTIONS
+      await fetch(TRANSACTIONS_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
       });
 
-      // prevent UI jump feeling 
-      fetchExpenses();
+      showToast?.success?.("Expense saved");
 
-    } catch (err) {
-      showToast.error(
-        "Failed to save expense"
-      );
+      setFormData(initialForm);
+      setCustomCategory("");
+      setErrors({});
+
+      fetchExpenses?.();
+      fetchTransactions?.();
+    } catch {
+      showToast?.error?.("Failed to save expense");
     }
   };
 
-  // UI 
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">
         Add Expense
       </h2>
 
-      {/* CATEGORY MANAGER */}
+      {/* CATEGORY LIST */}
       <div className="bg-white p-3 mb-4 rounded shadow">
-        <h3 className="font-bold mb-2">
-          Categories
-        </h3>
+        <h3 className="font-bold mb-2">Categories</h3>
 
         <div className="flex flex-wrap gap-2">
-          {categories.map((c) => (
+          {categories.map((c, i) => (
             <div
-              key={c}
+              key={i}
               className="bg-gray-100 px-3 py-1 rounded flex items-center gap-2"
             >
-              {c}
+              <span>{c}</span>
 
               <button
-                type="button"
-                onClick={() =>
-                  handleDeleteCategory(c)
-                }
+                onClick={() => handleDeleteCategory(c)}
                 className="text-red-500 font-bold"
               >
-                ✕
+                ×
               </button>
             </div>
           ))}
@@ -290,181 +215,97 @@ export default function AddExpense({
       </div>
 
       {/* FORM */}
-      <form
-        onSubmit={handleSubmit}
-        noValidate
-        className="grid gap-3"
-      >
-        {/* TITLE */}
-        <div>
-          <input
-            type="text"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            placeholder="Title"
-            className={`border p-2 rounded w-full ${
-              errors.title
-                ? "border-red-500"
-                : ""
-            }`}
-          />
-          {errors.title && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.title}
-            </p>
-          )}
-        </div>
+      <form onSubmit={handleSubmit} className="grid gap-3">
 
-        {/* CATEGORY */}
-        <div>
-          <select
-            name="category"
-            value={formData.category}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                category: e.target.value,
-              })
-            }
-            onBlur={(e) =>
-              validateField(
-                "category",
-                e.target.value
-              )
-            }
-            className={`border p-2 rounded w-full ${
-              errors.category
-                ? "border-red-500"
-                : ""
-            }`}
-          >
-            <option value="">
-              Select Category
+        <input
+          name="title"
+          value={formData.title}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          placeholder="Title"
+          className="border p-2 rounded"
+        />
+
+        <select
+          name="category"
+          value={formData.category}
+          onChange={handleChange}
+          className="border p-2 rounded"
+        >
+          <option value="">Select Category</option>
+
+          {categories.map((c, i) => (
+            <option key={i} value={c}>
+              {c}
             </option>
+          ))}
 
-            {categories.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
+          <option value="__new">Add New</option>
+        </select>
 
-            <option value="__new">
-              + Add New Category
-            </option>
-          </select>
-
-          {errors.category && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.category}
-            </p>
-          )}
-        </div>
-
-        {/* NEW CATEGORY */}
         {formData.category === "__new" && (
-          <div>
-            <input
-              type="text"
-              value={customCategory}
-              onChange={(e) =>
-                setCustomCategory(e.target.value)
-              }
-              onBlur={() =>
-                validateField(
-                  "customCategory",
-                  customCategory
-                )
-              }
-              placeholder="Enter new category"
-              className={`border p-2 rounded w-full ${
-                errors.customCategory
-                  ? "border-red-500"
-                  : ""
-              }`}
-            />
-
-            {errors.customCategory && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.customCategory}
-              </p>
-            )}
-          </div>
+          <input
+            value={customCategory}
+            onChange={(e) =>
+              setCustomCategory(e.target.value)
+            }
+            placeholder="New category"
+            className="border p-2 rounded"
+          />
         )}
 
-        {/* AMOUNT */}
-        <div>
-          <input
-            type="number"
-            name="amount"
-            value={formData.amount}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            placeholder="Amount"
-            className={`border p-2 rounded w-full ${
-              errors.amount
-                ? "border-red-500"
-                : ""
-            }`}
-          />
+        <input
+          name="amount"
+          type="number"
+          value={formData.amount}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          placeholder="Amount"
+          className="border p-2 rounded"
+        />
 
-          {errors.amount && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.amount}
-            </p>
-          )}
-        </div>
+        <input
+          name="date"
+          type="date"
+          value={formData.date}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          className="border p-2 rounded"
+        />
 
-        {/* DATE */}
-        <div>
-          <input
-            type="date"
-            name="date"
-            value={formData.date}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            className={`border p-2 rounded w-full ${
-              errors.date
-                ? "border-red-500"
-                : ""
-            }`}
-          />
-
-          {errors.date && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.date}
-            </p>
-          )}
-        </div>
-
-        {/* DESCRIPTION */}
-        <div>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            placeholder="Description"
-            className={`border p-2 rounded w-full ${
-              errors.description
-                ? "border-red-500"
-                : ""
-            }`}
-          />
-
-          {errors.description && (
-            <p className="text-red-500 text-sm mt-1">
-              {errors.description}
-            </p>
-          )}
-        </div>
-
-        {/* SUBMIT */}
-        <button
-          type="submit"
-          className="bg-blue-500 hover:bg-blue-600 transition text-white p-2 rounded"
+        {/* WALLET SELECT */}
+        <select
+          name="wallet"
+          value={formData.wallet}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          className="border p-2 rounded"
         >
+          <option value="">Select Wallet</option>
+
+          {wallets.map((w) => (
+            <option key={w.id} value={w.id}>
+              {w.name}
+            </option>
+          ))}
+        </select>
+
+        {errors.wallet && (
+          <p className="text-red-500 text-sm">
+            {errors.wallet}
+          </p>
+        )}
+
+        <textarea
+          name="description"
+          value={formData.description}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          placeholder="Description"
+          className="border p-2 rounded"
+        />
+
+        <button className="bg-blue-500 text-white p-2 rounded">
           Save Expense
         </button>
       </form>

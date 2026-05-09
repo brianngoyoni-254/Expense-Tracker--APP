@@ -1,68 +1,158 @@
 {
   "expenses": [
     {
-      "id": "1",
-      "title": "Transport",
-      "description": "Matatu fare to town",
-      "category": "Transport",
-      "amount": 100,
-      "date": "2026-05-06"
-    },
-    {
-      "id": "2",
-      "title": "Lunch",
-      "description": "Food at hotel",
-      "category": "Food",
-      "amount": 400,
-      "date": "2026-05-06"
-    },
-    {
-      "title": "football",
-      "description": "watching football",
+      "id": "Bw5grlbe9bA",
+      "title": "Football",
+      "description": "watching Epl with friends",
       "category": "Sports",
       "amount": 5000,
-      "date": "2026-05-08",
-      "id": "Q2uttO7BQzw"
+      "date": "2026-05-10",
+      "type": "expense",
+      "wallet": "-Ksikb7poNA"
     },
     {
-      "title": "PS",
-      "description": "Gaming with friends",
+      "id": "BRomD-O7W5s",
+      "title": "Football",
+      "description": "watching EPL with friends",
       "category": "Sports",
-      "amount": 500,
-      "date": "2026-05-09",
-      "id": "SctA1-Qj_Lc"
+      "amount": 5000,
+      "date": "2026-05-10",
+      "type": "expense",
+      "wallet": "-Ksikb7poNA"
     },
     {
+      "id": "fmOl0-2_n38",
       "title": "Fish",
-      "description": "Enjoyed some nice tilapia at wakalucy",
+      "description": "Enjoyed fish and Ugali at Wakalucy",
       "category": "Food",
-      "amount": 300,
-      "date": "2026-05-08",
-      "id": "5WixbQ4gWFY"
+      "amount": 1000,
+      "date": "2026-05-09",
+      "type": "expense",
+      "wallet": "default"
     },
     {
-      "title": "ps",
-      "description": "gaming with friends",
-      "category": "Sports",
-      "amount": 500,
-      "date": "2026-05-08",
-      "id": "m5Q4g6gYe0k"
+      "id": "Npk5Zs9NnhI",
+      "title": "Fish",
+      "description": "Enjoyed some Tilapia Fish at Wakalucy",
+      "category": "Food",
+      "amount": 1000,
+      "date": "2026-05-09",
+      "type": "expense",
+      "wallet": "bank"
     },
     {
+      "id": "bbRb3Rvhbqw",
+      "title": "Fish",
+      "description": "bought Tilapia fish at Wakalucy",
+      "category": "Food",
+      "amount": 1000,
+      "date": "2026-05-09",
+      "type": "expense",
+      "wallet": "-Ksikb7poNA"
+    },
+    {
+      "id": "GAaBY6U79uQ",
       "title": "Roadtrip",
-      "description": "travel  to Namanga",
+      "description": "went to namanga ",
       "category": "Transport",
       "amount": 5000,
-      "date": "2026-05-08",
-      "id": "u6AZdbonuPc"
+      "date": "2026-05-05",
+      "type": "expense",
+      "wallet": "JjyDYVqx3SM"
     },
     {
-      "title": "Deploying websites",
-      "description": "deploying several websites and hosting them",
+      "id": "HDpNmP8Pdp0",
+      "title": "web hosting",
+      "description": "hosted my three websites",
       "category": "Programming",
       "amount": 10000,
+      "date": "2026-05-08",
+      "type": "expense",
+      "wallet": "-Ksikb7poNA"
+    }
+  ],
+  "income": [],
+  "wallets": [
+    {
+      "id": "oqTaTHHMMKg",
+      "name": "Mpesa"
+    },
+    {
+      "id": "-Ksikb7poNA",
+      "name": "Bank"
+    },
+    {
+      "id": "JjyDYVqx3SM",
+      "name": "Cash"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "Jw1oYVUURYU",
+      "title": "Salary",
+      "description": "paid my full monthly salary",
+      "amount": 100000,
       "date": "2026-05-09",
-      "id": "dZcEwDaNqTY"
+      "wallet": "-Ksikb7poNA",
+      "type": "income"
+    },
+    {
+      "id": "v-iaL2sQPM4",
+      "title": "Football",
+      "description": "watching EPL with friends",
+      "category": "Sports",
+      "amount": 5000,
+      "date": "2026-05-10",
+      "type": "expense",
+      "wallet": "-Ksikb7poNA"
+    },
+    {
+      "id": "B5JSNzvt8Ow",
+      "title": "Freelance",
+      "description": "Received my academic writing payments",
+      "amount": 50000,
+      "date": "2026-05-02",
+      "wallet": "oqTaTHHMMKg",
+      "type": "income"
+    },
+    {
+      "id": "W3FN8rXl-p4",
+      "title": "Chama",
+      "description": "Received my monthly chama contributions",
+      "amount": 20000,
+      "date": "2026-05-01",
+      "wallet": "JjyDYVqx3SM",
+      "type": "income"
+    },
+    {
+      "id": "JJxzWaEMLDU",
+      "title": "Fish",
+      "description": "bought Tilapia fish at Wakalucy",
+      "category": "Food",
+      "amount": 1000,
+      "date": "2026-05-09",
+      "type": "expense",
+      "wallet": "-Ksikb7poNA"
+    },
+    {
+      "id": "uEz8Ibq5SxY",
+      "title": "Roadtrip",
+      "description": "went to namanga ",
+      "category": "Transport",
+      "amount": 5000,
+      "date": "2026-05-05",
+      "type": "expense",
+      "wallet": "JjyDYVqx3SM"
+    },
+    {
+      "id": "yAtEvgpmIBA",
+      "title": "web hosting",
+      "description": "hosted my three websites",
+      "category": "Programming",
+      "amount": 10000,
+      "date": "2026-05-08",
+      "type": "expense",
+      "wallet": "-Ksikb7poNA"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

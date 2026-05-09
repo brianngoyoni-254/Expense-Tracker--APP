@@ -1,211 +1,220 @@
+
 # Expense Tracker App
 
-A modern and responsive Expense Tracker built with React and Tailwind CSS.  
-The application helps users manage expenses efficiently with smart search, category management, sorting, editing, dashboard analytics, and real-time notifications.
+A modern, responsive **Expense Tracker Web Application** built with React that helps users manage income, expenses, wallets, and financial insights using interactive charts and real-time state management.
 
 ---
 
-# Features
+##  Features
 
-## Dashboard Analytics
-- View total expenses
-- Daily expense summary
-- Weekly expense summary
-- Monthly expense summary
-- Yearly expense summary
+-  Interactive financial dashboard
+-  Add, edit, and delete expenses
+-  Income tracking with wallet breakdown
+-  Transaction history management
+-  Smart search with suggestions & history
+- Sorting (amount, date, category)
+-  Data visualization using charts
+-  Multi-wallet support
+- Real-time state updates
+- Fully responsive UI
+- Nested routing with React Router v6
+- Layout system with persistent sidebar
+- Toast notifications system
 
-## Smart Search
-- Google-style smart search bar
-- Dynamic search suggestions
-- Search history stored in localStorage
-- Search icon trigger
-- Clear search button
-- Auto placeholder animation
-- Dropdown suggestions and recent searches
+---
 
-## Expense Management
-- Add expenses
-- Edit expenses
-- Delete expenses
-- Real-time updates
+## Tech Stack
 
-## Category Management
-- Create custom categories
-- Reuse existing categories
-- Delete categories with all related expenses
+### Frontend
+- React (Vite / CRA)
+- React Router v6 (Nested Routes + `<Outlet />`)
+- Recharts (Charts & Data Visualization)
+- Tailwind CSS (Styling)
+- JavaScript (ES6+)
 
-## Sorting
-Sort expenses by:
-- Amount
-- Date
-- Category
+### Backend
+- JSON Server (`db.json`)
+- REST API simulation
+- Separate backend folder inside project
 
-## Validation
-- Required field validation
-- Positive amount validation
-- Duplicate category prevention
+---
 
-## Notifications
-Beautiful toast notifications using React Toastify:
+##  Project Structure
+
+```
+
+expense-tracker/
+│
+├── backend/
+│   └── db.json
+│
+├── src/
+│   ├── components/
+│   ├── pages/
+│   ├── layouts/
+│   ├── hooks/
+│   ├── App.jsx
+│   └── main.jsx
+│
+└── README.md
+
+```
+
+---
+
+##  Routing (React Router v6)
+
+This project uses **React Router v6** with a nested layout system.
+
+### Main Layout
+- `MainLayout.jsx` wraps all pages
+- Uses `<Outlet />` to render child routes
+- Persistent sidebar across all pages
+
+### Routes
+
+| Route | Page |
+|------|------|
+| `/` | Dashboard |
+| `/add-expense` | Add Expense |
+| `/expenses` | Expenses |
+| `/income` | Income |
+| `/wallets` | Wallets |
+| `/transactions` | Transactions |
+
+---
+
+## Layout System
+
+### MainLayout Features
+
+- Sticky sidebar (always visible)
+- Scrollable main content area
+- Global footer across all pages:
+```
+---
+
+##  Dashboard Features
+
+### Financial Overview
+- Total Balance
+- Total Income
+- Total Expenses
+- Savings Rate
+
+### Charts (Recharts)
+-  Bar Chart → Income vs Expenses per day
+- Line Chart → Cash flow trend over time
+
+### Smart UI Enhancements
+- Sticky search + sort bar
+- Scrollable expense list (fixed height)
+- Recent transactions table (limited height with scroll)
+
+---
+
+##  Smart Search System
+
+- Auto-suggestions from transaction titles
+- Search history saved in `localStorage`
+- Live filtering of expenses
+- Animated placeholder rotation
+- Click-to-select suggestions
+
+---
+
+##  Wallet System
+
+- Create multiple wallets
+- Track:
+  - Income per wallet
+  - Expenses per wallet
+  - Wallet balance
+- Prevent duplicate wallet creation
+- Wallet deletion with confirmation
+
+---
+
+##  Expense Management
+
+- Add new expenses
+- Edit existing expenses
+- Delete with confirmation
+- Category system with dynamic creation
+- Validation handling
+
+---
+
+##  Income Tracking
+
+- Add income entries
+- Wallet-based income breakdown
+- Total income calculation
+- Linked to transactions system
+
+---
+
+##  Transactions Module
+
+- Unified record of income + expenses
+- Scrollable table view
+- Sticky table headers
+- Clean financial history view
+
+---
+
+##  Toast System
+
+Custom toast hook:
+
 - Success messages
-- Error messages
-- Warning messages
+- Error alerts
+- Warning notifications
+- Auto-dismiss after 3 seconds
 
 ---
 
-# Tech Stack
+## Backend Setup (JSON Server)
 
-- React
-- Tailwind CSS
-- React Hooks
-- React Toastify
-- JSON Server
-- LocalStorage
+Inside `/backend/db.json`
+
+### Run backend:
+```bash
+json-server --watch db.json --port 3001
+````
 
 ---
 
-# Project Structure
+## Frontend Setup
 
 ```bash
-src/
-│
-├── components/
-│   ├── Sidebar.jsx
-│   ├── SmartSearch.jsx
-│   └── Toast.jsx
-│
-├── hooks/
-│   └── useToast.js
-│
-├── pages/
-│   ├── AddExpense.jsx
-│   ├── Dashboard.jsx
-│   └── Expenses.jsx
-│
-├── App.jsx
-└── main.jsx
-
-Installation
-1. Clone the Repository
-git clone 
-2. Navigate into the Project
-cd expense-tracker
-3. Install Dependencies
 npm install
-
-Running the Project
-Start React App
 npm run dev
-Start JSON Server
-Make sure you have JSON Server installed:
-npm install -g json-server
-Run the backend server:
-json-server --watch db.json --port 3001
+```
 
-API Endpoint
-http://localhost:3001/expenses
+---
 
-Main Components
-Sidebar
-Handles application navigation:
-    • Dashboard
-    • Add Expense
-    • Expenses List
+## Key UI/UX Decisions
 
-SmartSearch
-Advanced search component with:
-    • Search suggestions
-    • Search history
-    • Search icon action
-    • Auto placeholder rotation
-    • Search dropdown
-    • Sort functionality
+* Sticky sidebar for navigation
+* Sticky search & filter bar
+* Scrollable data containers (no layout overflow)
+* Clean financial card-based design
+* Responsive grid system
+* Minimal but modern UI
 
-Dashboard
-Displays:
-    • Expense analytics
-    • Filtered results
-    • Search and sorting
-    • Expense summaries
+---
 
-AddExpense
-Features:
-    • Form validation
-    • Custom categories
-    • Category deletion
-    • Expense submission
+## Future Improvements
 
-Expenses
-Allows users to:
-    • View all expenses
-    • Edit expenses
-    • Delete expenses
+* Authentication system (login/signup)
+* Real database integration (MongoDB / PostgreSQL)
+* Export to PDF / Excel
+* Budget planning module
+* Monthly analytics dashboard
 
-Search Features
-The smart search system includes:
-    • Live filtering
-    • Auto suggestions
-    • Search history persistence
-    • Enter key search
-    • Click-to-search icon
-    • Google-style UI behavior
+---
 
-Validation Rules
-Field
-Validation
-Title
-Required
-Description
-Required
-Category
-Required
-Amount
-Must be greater than 0
-Date
-Required
+## 👨‍💻 Author
 
-Toast Notifications
-The app uses React Toastify for notifications.
-Examples:
-    • Expense added successfully
-    • Expense updated successfully
-    • Delete failed
-    • Validation errors
-
-State Management
-The application uses React Hooks:
-    • useState
-    • useEffect
-    • useMemo
-    • useCallback
-    • useRef
-
-Performance Optimizations
-    • useMemo for expensive calculations
-    • useCallback for stable functions
-    • Optimized rendering
-    • Local state separation
-
-UI Design
-Built with Tailwind CSS:
-    • Responsive layout
-    • Modern dashboard
-    • Rounded cards
-    • Smooth transitions
-    • Sticky search bar
-    • Clean typography
-
-Future Improvements
-Possible future upgrades:
-    • Authentication
-    • Charts and graphs
-    • Export to PDF/CSV
-    • Dark mode
-    • Pagination
-    • Backend database integration
-    • Mobile app version
-
-Author
-Developed by [Brian]
-
-
+**Brian**

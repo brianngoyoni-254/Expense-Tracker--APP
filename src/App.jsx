@@ -1,129 +1,180 @@
-import { useEffect, useState, useCallback } from "react";
-import Sidebar from "./components/Sidebar";
+import { useEffect, useState } from "react";
+import { Routes, Route } from "react-router-dom";
+
+import MainLayout from "./layouts/MainLayout";
+
 import Dashboard from "./pages/Dashboard";
 import AddExpense from "./pages/AddExpense";
 import Expenses from "./pages/Expenses";
-
-// REACT-TOASTIFY 
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-
-const API_URL = "http://localhost:3001/expenses";
+import Wallets from "./pages/Wallets";
+import Income from "./pages/Income";
+import Transactions from "./pages/Transactions";
 
 export default function App() {
-  const [page, setPage] = useState("dashboard");
-  const [expenses, setExpenses] = useState([]);
+  const API = "http://localhost:3001";
 
-  // GLOBAL SEARCH 
+  
+  // SINGLE SOURCE OF TRUTH
+  
+  const [transactions, setTransactions] = useState([]);
+  const [wallets, setWallets] = useState([]);
+
   const [search, setSearch] = useState("");
   const [sortType, setSortType] = useState("");
 
-  // FETCH EXPENSES 
-  const fetchExpenses = useCallback(async () => {
+
+  // MASTER SYNC FUNCTION
+
+  const refreshAll = async () => {
     try {
-      const res = await fetch(API_URL);
-      const data = await res.json();
-      setExpenses(data);
-    } catch (error) {
-      toast.error("Failed to load expenses");
+      const [trxRes, walletRes] = await Promise.all([
+        fetch(`${API}/transactions`),
+        fetch(`${API}/wallets`),
+      ]);
+
+      const trxData = await trxRes.json();
+      const walletData = await walletRes.json();
+
+      setTransactions(
+        Array.isArray(trxData) ? trxData : []
+      );
+
+      setWallets(
+        Array.isArray(walletData) ? walletData : []
+      );
+    } catch (err) {
+      console.log("Sync failed", err);
     }
+  };
+
+  
+  // INITIAL LOAD
+  
+  useEffect(() => {
+    refreshAll();
   }, []);
 
-  useEffect(() => {
-    fetchExpenses();
-  }, [fetchExpenses]);
-
-  //  DELETE EXPENSE 
+  
+  // DELETE TRANSACTION
+  
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this expense?"
-    );
-
-    if (!confirmDelete) return;
-
     try {
-      await fetch(`${API_URL}/${id}`, {
+      await fetch(`${API}/transactions/${id}`, {
         method: "DELETE",
       });
 
-      toast.success("Expense deleted successfully");
-      fetchExpenses();
-    } catch (error) {
-      toast.error("Delete failed");
+      refreshAll();
+    } catch (err) {
+      console.log(err);
     }
   };
 
-  //  EDIT EXPENSE 
-  const handleEdit = async (updatedExpense) => {
-    try {
-      const res = await fetch(`${API_URL}/${updatedExpense.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedExpense),
-      });
-
-      if (!res.ok) throw new Error();
-
-      toast.success("Expense updated successfully");
-      fetchExpenses();
-    } catch (error) {
-      toast.error("Update failed");
-    }
+  
+  // TOAST SYSTEM
+  
+  const showToast = {
+    success: (msg) => alert(msg),
+    error: (msg) => alert(msg),
+    warning: (msg) => alert(msg),
   };
 
-  // RESET SEARCH WHEN PAGE CHANGES 
-  useEffect(() => {
-    setSearch("");
-    setSortType("");
-  }, [page]);
-
+  
+  // UI ROUTES
+  
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <Routes>
 
-      {/* SIDEBAR */}
-      <Sidebar page={page} setPage={setPage} />
-
-      {/* MAIN AREA */}
-      <div className="flex-1 p-6 overflow-y-auto">
-
-        {/* TOAST */}
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          theme="colored"
-        />
+      <Route
+        path="/"
+        element={<MainLayout />}
+      >
 
         {/* DASHBOARD */}
-        {page === "dashboard" && (
-          <Dashboard
-            expenses={expenses}
-            search={search}
-            setSearch={setSearch}
-            sortType={sortType}
-            setSortType={setSortType}
-          />
-        )}
+        <Route
+          index
+          element={
+            <Dashboard
+              transactions={transactions}
+              wallets={wallets}
+              search={search}
+              setSearch={setSearch}
+              sortType={sortType}
+              setSortType={setSortType}
+            />
+          }
+        />
 
         {/* ADD EXPENSE */}
-        {page === "add" && (
-          <AddExpense
-            expenses={expenses}
-            fetchExpenses={fetchExpenses}
-          />
-        )}
+        <Route
+          path="add-expense"
+          element={
+            <AddExpense
+              expenses={transactions.filter(
+                (t) => t.type === "expense"
+              )}
 
-        {/* EXPENSES LIST */}
-        {page === "expenses" && (
-          <Expenses
-            expenses={expenses}
-            handleDelete={handleDelete}
-            handleEdit={handleEdit}
-          />
-        )}
+              
+              // PASS REAL WALLETS INTO AddExpense
+              wallets={wallets}
 
-      </div>
-    </div>
+              fetchExpenses={refreshAll}
+              fetchTransactions={refreshAll}
+              showToast={showToast}
+            />
+          }
+        />
+
+        {/* EXPENSES */}
+        <Route
+          path="expenses"
+          element={
+            <Expenses
+              expenses={transactions.filter(
+                (t) => t.type === "expense"
+              )}
+              handleDelete={handleDelete}
+            />
+          }
+        />
+
+        {/* WALLETS */}
+        <Route
+          path="wallets"
+          element={
+            <Wallets
+              wallets={wallets}
+              transactions={transactions}
+              fetchWallets={refreshAll}
+              showToast={showToast}
+            />
+          }
+        />
+
+        {/* INCOME */}
+        <Route
+          path="income"
+          element={
+            <Income
+              transactions={transactions}
+              wallets={wallets}
+              fetchTransactions={refreshAll}
+              showToast={showToast}
+            />
+          }
+        />
+
+        {/* TRANSACTIONS */}
+        <Route
+          path="transactions"
+          element={
+            <Transactions
+              transactions={transactions}
+            />
+          }
+        />
+
+      </Route>
+
+    </Routes>
   );
 }
