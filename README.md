@@ -215,6 +215,6 @@ npm run dev
 
 ---
 
-## 👨‍💻 Author
+##  Author
 
 **Brian**
